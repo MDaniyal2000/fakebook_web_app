@@ -54,6 +54,8 @@ window.onload = function() {
 //Registeration Form Validation
 $('#registerSubmit').on('click', function(e){
     e.preventDefault();
+    btn = $(this);
+    btn.prop('disabled', true);
     first_name = $('#firstName').val();
     last_name = $('#lastName').val();
     email = $('#emailInput').val();
@@ -126,6 +128,7 @@ $('#registerSubmit').on('click', function(e){
         {
             $('#errorMessage').removeClass('d-none');
             $('#errorMessage').html('Passwords do not match');
+            btn.prop('disabled', false);
         }
         else{
             var formDataRaw = $('#registrationForm')[0];
@@ -148,6 +151,7 @@ $('#registerSubmit').on('click', function(e){
                             $('#errorMessage').removeClass('d-none');
                         }
                         $('#errorMessage').html(response.message);
+                        btn.prop('disabled', false)
                     }
                 },
                 error: function(error) {
@@ -155,15 +159,20 @@ $('#registerSubmit').on('click', function(e){
                         $('#errorMessage').removeClass('d-none');
                     }
                     $('#errorMessage').html(error.message);
+                    btn.prop('disabled', false);
                 }
             });
         }
+    } else {
+        btn.prop('disabled', false);
     }
 })
 
 //Login Form Validation
 $('#loginSubmit').on('click',function(e){
     e.preventDefault();
+    btn = $(this);
+    btn.prop('disabled', true);
     if( $('.login_form #emailInput').val() == ''){
         $('.login_form #emailInput').addClass('is-invalid');
     }
@@ -195,6 +204,7 @@ $('#loginSubmit').on('click',function(e){
                         $('#errorMessage').removeClass('d-none');
                     }
                     $('#errorMessage').html('Invalid login details');
+                    btn.prop('disabled', false);
                 }
                 else{
                     window.location.href = '/'
@@ -205,8 +215,11 @@ $('#loginSubmit').on('click',function(e){
                     $('#errorMessage').removeClass('d-none');
                 }
                 $('#errorMessage').html(error.message);
+                btn.prop('disabled', false);
             }
         });
+    } else {
+        btn.prop('disabled', false);
     }
 })
 
@@ -257,7 +270,7 @@ $('#postButton').on('click', function(e){
 })
 
 //Send Request
-$('.sendRequest').on('click', function() {
+$(document).on('click', '.sendRequest', function() {
     if ($(this).hasClass('btn-success'))
     {
         btn = $(this);
@@ -273,7 +286,7 @@ $('.sendRequest').on('click', function() {
 })
 
 //Cancel Request
-$('.cancelRequest').on('click', function() {
+$(document).on('click', '.cancelRequest', function() {
     btn = $(this);
     request_id = $(this).parent().find('input').val();
     $.post("/cancel_request", {request_id:request_id},
@@ -286,7 +299,7 @@ $('.cancelRequest').on('click', function() {
 })
 
 //Delete Request
-$('.deleteRequest').on('click', function() {
+$(document).on('click', '.deleteRequest', function() {
     btn = $(this);
     request_id = $(this).parent().find('input').val();
     $.post("/remove_request", {request_id:request_id},
@@ -299,7 +312,7 @@ $('.deleteRequest').on('click', function() {
 })
 
 //Confirm Request
-$('.confRequest').on('click', function(){
+$(document).on('click', '.confRequest', function(){
     btn = $(this);
     request_id = $(this).parent().find('input').val();
     $.post("/accept_request", {request_id:request_id},
@@ -312,7 +325,7 @@ $('.confRequest').on('click', function(){
 })
 
 //Remove Friend
-$('.unfriend').on('click', function(){
+$(document).on('click', '.unfriend', function(){
     btn = $(this);
     friend_id = $(this).parent().find('input').val();
     $.post("/remove_friend", {friend_id:friend_id},
@@ -329,7 +342,7 @@ $('.unfriend').on('click', function(){
 })
 
 //Delete Post
-$('.deletePost').on('click', function() {
+$(document).on('click', '.deletePost', function() {
     btn = $(this);
     post_id = $(this).parent().find('input').val();
     $.post("/delete_post", {post_id:post_id},
@@ -342,7 +355,7 @@ $('.deletePost').on('click', function() {
 })
 
 //Like Button
-$('.likePost').on('click', function() {
+$(document).on('click', '.likePost', function() {
     btn = $(this)
     var count = btn.find('.likesCount').html();
     count = parseInt(count);

@@ -10,6 +10,8 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:12345@localhost/f
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['UPLOAD_FOLDER'] = 'static/images'
 app.config['SECRET_KEY'] = 'YMyqz0uWN0'
+app.config["ALLOWED_IMAGE_EXTENSIONS"] = ["JPEG", "JPG", "PNG", "GIF"]
+app.config["MAX_IMAGE_FILESIZE"] = 0.5 * 1024 * 1024
 
 db = SQLAlchemy(app)
 
@@ -161,6 +163,24 @@ def registerUser():
                 'message' : 'Email already exists'
             })
 
+        filename = pic.filename
+        if '.' not in filename:
+            return json.dumps({
+                'message' : 'File extension not allowed'
+            })
+
+        ext = filename.rsplit(".", 1)[1]
+        if ext.upper() not in app.config["ALLOWED_IMAGE_EXTENSIONS"]:
+            return json.dumps({
+                'message' : 'File extension not allowed'
+            })
+
+        filesize = request.cookies["filesize"]
+        if int(filesize) > app.config["MAX_IMAGE_FILESIZE"]:
+            return json.dumps({
+                'message' : 'Image size should be less than 50 KBs'
+            })
+
         user = User(first_name=fname, last_name=lname, email_address=email, password=password1,  gender=gender, dob=dob, profile_picture='temp')
         db.session.add(user)
         db.session.commit()
@@ -178,6 +198,7 @@ def registerUser():
             'message' : 'success'
         })
     except Exception as e:
+        print(e)
         return json.dumps({
             'message' : str(e)
         })
@@ -247,16 +268,16 @@ def requests():
             user = User.query.filter_by(id=user_id).first()
             sent_requests_found = user.sent_requests
             sent_requests = []
-            for i in range(len(sent_requests_found)):
-                friend_id = sent_requests_found[i].requested_to
+            for req in sent_requests_found:
+                friend_id = req.requested_to
                 friend = User.query.filter_by(id=friend_id).first()
-                sent_requests.append([sent_requests_found[i], friend])
+                sent_requests.append([req, friend])
             recd_requests_found = user.recd_requests
             recd_requests = []
-            for i in range(len(recd_requests_found)):
-                friend_id = recd_requests_found[i].requested_by
+            for req in recd_requests_found:
+                friend_id = req.requested_by
                 friend = User.query.filter_by(id=friend_id).first()
-                recd_requests.append([recd_requests_found[i], friend])
+                recd_requests.append([req, friend])
             else:
                 return render_template('requests.html', sent=sent_requests, receive=recd_requests, user=user)
     except:
@@ -462,4 +483,4 @@ def unlike_post():
         })
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0')
