@@ -131,37 +131,48 @@ $('#registerSubmit').on('click', function(e){
             btn.prop('disabled', false);
         }
         else{
-            var formDataRaw = $('#registrationForm')[0];
-            var form_data = new FormData(formDataRaw);
-            $.ajax({
-                type: 'POST',
-                cache: false,
-                data: form_data,
-                dataType: 'json',
-                url: '/register',
-                contentType: false,
-                processData: false,
-                success: function(response) {
-                    if (response.message == "success")
-                    {
-                        window.location.href = '/login'
-                    }
-                    else{
+            filesize = ($("#profilePic"))[0].files[0].size;
+            if (filesize > 524288)
+            {
+                if ($('#errorMessage').hasClass('d-none')){
+                    $('#errorMessage').removeClass('d-none');
+                }
+                $('#errorMessage').html('Image size should be less than 50 KBs');
+                btn.prop('disabled', false);
+            }
+            else {
+                var formDataRaw = $('#registrationForm')[0];
+                var form_data = new FormData(formDataRaw);
+                $.ajax({
+                    type: 'POST',
+                    cache: false,
+                    data: form_data,
+                    dataType: 'json',
+                    url: '/register',
+                    contentType: false,
+                    processData: false,
+                    success: function(response) {
+                        if (response.message == "success")
+                        {
+                            window.location.href = '/login'
+                        }
+                        else{
+                            if ($('#errorMessage').hasClass('d-none')){
+                                $('#errorMessage').removeClass('d-none');
+                            }
+                            $('#errorMessage').html(response.message);
+                            btn.prop('disabled', false);
+                        }
+                    },
+                    error: function(error) {
                         if ($('#errorMessage').hasClass('d-none')){
                             $('#errorMessage').removeClass('d-none');
                         }
-                        $('#errorMessage').html(response.message);
-                        btn.prop('disabled', false)
+                        $('#errorMessage').html(error.message);
+                        btn.prop('disabled', false);
                     }
-                },
-                error: function(error) {
-                    if ($('#errorMessage').hasClass('d-none')){
-                        $('#errorMessage').removeClass('d-none');
-                    }
-                    $('#errorMessage').html(error.message);
-                    btn.prop('disabled', false);
-                }
-            });
+                });
+            }
         }
     } else {
         btn.prop('disabled', false);

@@ -175,12 +175,6 @@ def registerUser():
                 'message' : 'File extension not allowed'
             })
 
-        filesize = request.cookies["filesize"]
-        if int(filesize) > app.config["MAX_IMAGE_FILESIZE"]:
-            return json.dumps({
-                'message' : 'Image size should be less than 50 KBs'
-            })
-
         user = User(first_name=fname, last_name=lname, email_address=email, password=password1,  gender=gender, dob=dob, profile_picture='temp')
         db.session.add(user)
         db.session.commit()
@@ -198,7 +192,6 @@ def registerUser():
             'message' : 'success'
         })
     except Exception as e:
-        print(e)
         return json.dumps({
             'message' : str(e)
         })
@@ -483,4 +476,4 @@ def unlike_post():
         })
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0')
+    app.run(host='0.0.0.0', debug=True)
